@@ -8,6 +8,7 @@ import { GloablModule } from 'src/gloabl/gloabl.module';
 @Module({
   providers: [SellerService],
   controllers: [SellerController],
-  imports:[TypeOrmModule.forFeature([Seller]),GloablModule]
+  imports:[TypeOrmModule.forFeature([Seller]),GloablModule],
+  exports:[SellerService]
 })
 export class SellerModule {}

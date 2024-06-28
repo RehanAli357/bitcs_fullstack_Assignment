@@ -1,63 +1,61 @@
 import {
   BadRequestException,
-  HttpException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Customer } from './entity/customers.entity';
+import { Admin } from './entity/amin.entity';
 import { Repository } from 'typeorm';
-import * as jwt from 'jsonwebtoken';
 import { GloablService } from 'src/gloabl/gloabl.service';
-import { authUserInterface } from '../gloabl/interface/auth-user.interface';
 import { addUserDto } from 'src/gloabl/globalDto/add-user.dto';
 import { loginUserDto } from 'src/gloabl/globalDto/login-user.dto';
+import * as jwt from 'jsonwebtoken';
+import { authAdminInterface } from 'src/gloabl/interface/auth-admin.interface';
 import { updateUserPasswordDto } from 'src/gloabl/globalDto/update-user.dto';
+import { CustomerService } from 'src/customer/customer.service';
+import { SellerService } from 'src/seller/seller.service';
 
 export enum ERole {
-  customer = 'cus001',
-  admin = 'adm001',
+  admin = 'admin1',
 }
 
 @Injectable()
-export class CustomerService {
+export class AdminService {
   constructor(
-    @InjectRepository(Customer)
-    private customerRepository: Repository<Customer>,
-
+    @InjectRepository(Admin)
+    private adminRepository: Repository<Admin>,
     private globalService: GloablService,
+    private customerService: CustomerService,
+    private sellerService: SellerService,
   ) {}
 
-  async addCustomer(addCustomerDto: addUserDto): Promise<Object> {
+  async addAdmin(addAdminDto: addUserDto): Promise<object> {
     try {
-      const customer = await this.globalService.addUser(
-        addCustomerDto,
-        'customer',
-      );
-      await this.customerRepository.save(customer);
+      const admin = await this.globalService.addUser(addAdminDto, 'admin');
+      await this.adminRepository.save(admin);
       return {
         message: 'Added Successfully',
         status: true,
       };
     } catch (error) {
-      console.log(`Failed to add customer: ${error.message}`);
+      console.log(`Failed to add admin: ${error.message}`);
       throw new BadRequestException({
-        message: 'Failed to add customer',
+        message: 'Failed to add admin',
         status: false,
       });
     }
   }
 
-  async validateUSer(loginCustomerDto: loginUserDto): Promise<Customer> {
-    const user = await this.customerRepository.findOne({
-      where: { cEmail: loginCustomerDto.email },
+  async validateUSer(loginAdminDto: loginUserDto): Promise<Admin> {
+    const user = await this.adminRepository.findOne({
+      where: { aEmail: loginAdminDto.email },
     });
     if (
       user &&
       (await this.globalService.compareHash(
-        loginCustomerDto.password,
-        user.cPassword,
+        loginAdminDto.password,
+        user.aPassword,
       ))
     ) {
       return user;
@@ -69,9 +67,9 @@ export class CustomerService {
     }
   }
 
-  async loginCustomer(user): Promise<Object> {
+  async loginAdmin(user): Promise<Object> {
     try {
-      const payload = { cId: user.cId, roleId: user.roleId };
+      const payload = { aId: user.aId, roleId: user.roleId };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: '60m',
       });
@@ -91,9 +89,9 @@ export class CustomerService {
   async validateToken(token: string) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const cId = decoded.cId;
+      const aId = decoded.aId;
       const role = decoded.roleId;
-      return { cId: cId, role: role };
+      return { aId: aId, role: role };
     } catch (error) {
       console.log('Invalid Token :', error.message);
       throw new UnauthorizedException({
@@ -103,18 +101,18 @@ export class CustomerService {
     }
   }
 
-  async getCustomer(user: authUserInterface): Promise<Customer> {
+  async getAdmin(user) {
     try {
-      const customer = await this.customerRepository.findOne({
-        where: { cId: user.cId },
+      const admin = await this.adminRepository.findOne({
+        where: { aId: user.aId },
       });
-      if (!customer) {
+      if (!admin) {
         throw new NotFoundException({
-          message: 'Customer not found',
+          message: 'admin not found',
           status: false,
         });
       }
-      return customer;
+      return admin;
     } catch (error) {
       console.log('Unable to fetch user:', error.message);
       throw new BadRequestException({
@@ -125,20 +123,20 @@ export class CustomerService {
   }
 
   async updatePassword(
-    user: authUserInterface,
-    updateCustomerPasswordDto: updateUserPasswordDto,
+    user: authAdminInterface,
+    updateAdminPasswordDto: updateUserPasswordDto,
   ): Promise<object> {
     try {
-      const data = await this.getCustomer(user);
+      const data = await this.getAdmin(user);
       if (!data) {
         throw new NotFoundException({
-          message: 'Customer not found',
+          message: 'Admin not found',
           status: false,
         });
       } else {
         const isMatch = await this.globalService.updatePassword(
-          updateCustomerPasswordDto,
-          data.cPassword,
+          updateAdminPasswordDto,
+          data.aPassword,
         );
         if (isMatch === false) {
           throw new UnauthorizedException({
@@ -146,8 +144,8 @@ export class CustomerService {
             status: false,
           });
         } else {
-          await this.customerRepository.update(user.cId, {
-            cPassword: isMatch,
+          await this.adminRepository.update(data.aId, {
+            aPassword: isMatch,
           });
         }
       }
@@ -161,22 +159,21 @@ export class CustomerService {
     }
   }
 
-  async deleteCustomer(
-    user: authUserInterface,
-    loginCustomerDto: loginUserDto,
+  async deleteAdmin(
+    user: authAdminInterface,
+    loginSellerDto: loginUserDto,
   ): Promise<object> {
     try {
-      const data = await this.getCustomer(user);
+      const data = await this.getAdmin(user);
       if (!data) {
         throw new NotFoundException({
           message: 'Customer not found',
           status: false,
         });
       }
-
       const isMatch = await this.globalService.compareHash(
-        loginCustomerDto.password,
-        data.cPassword,
+        loginSellerDto.password,
+        data.aPassword,
       );
 
       if (!isMatch) {
@@ -185,9 +182,7 @@ export class CustomerService {
           status: false,
         });
       }
-
-      await this.customerRepository.delete(data.cId);
-
+      await this.adminRepository.delete(data.aId);
       return { message: 'User deleted successfully', status: true };
     } catch (error) {
       console.log('Error in deleting user:', error.message);
@@ -198,15 +193,28 @@ export class CustomerService {
     }
   }
 
-  async fetchAllCustomers():Promise<Customer[]>{
+  async fetchAllCustomer() {
     try {
-      return await this.customerRepository.find()
+      const data = await this.customerService.fetchAllCustomers();
+      return data;
     } catch (error) {
-      console.log('Error in Fetching users:', error.message);
       throw new BadRequestException({
-        message: 'Error in Fetching user',
+        message: 'Error in fetching user ',
         status: false,
       });
     }
   }
+
+  async fetchAllSeller(){
+    try {
+      const data = await this.sellerService.fetchAllSellers();
+      return data
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching user ',
+        status: false,
+      });
+    }
+  }
+
 }

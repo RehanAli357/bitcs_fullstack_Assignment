@@ -32,7 +32,6 @@ export class GloablService {
         roleId: process.env.CUSTOMER_ROLE,
         createdTime: new Date(),
       };
-      console.log(customer)
       return customer;
     } else if (type === 'seller') {
       const seller = {
@@ -44,6 +43,16 @@ export class GloablService {
         createdTime: new Date(),
       };
       return seller;
+    } else if(type === 'admin'){
+      const admin = {
+        aId: uuidv4(),
+        aName: user.name,
+        aEmail: user.email,
+        aPassword: hashPassword,
+        roleId: process.env.ADMIN_ROLE,
+        createdTime: new Date(),
+      };
+      return admin;
     }
   }
 

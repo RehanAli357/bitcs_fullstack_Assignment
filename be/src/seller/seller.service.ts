@@ -189,4 +189,16 @@ export class SellerService {
       });
     }
   }
+
+  async fetchAllSellers():Promise<Seller[]>{
+    try {
+      return await this.sellerRepository.find()
+    } catch (error) {
+      console.log('Error in Fetching users:', error.message);
+      throw new BadRequestException({
+        message: 'Error in Fetching user',
+        status: false,
+      });
+    }
+  }
 }

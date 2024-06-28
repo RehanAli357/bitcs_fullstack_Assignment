@@ -1,38 +1,38 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   Post,
   Put,
-  Req,
   UnauthorizedException,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
-import { CustomerService, ERole } from './customer.service';
-import { JoiValidationPipe } from 'src/gloabl/globalJob/joi-validation.pipe';
-import { addUserSchema } from 'src/gloabl/globalJob/add-user.job';
-import { BadRequestException } from '@nestjs/common/exceptions/bad-request.exception';
-import { loginUserSchema } from 'src/gloabl/globalJob/login-user.job';
-import { AuthGuard } from './gaurds/auth.gaurd';
-import { Customer } from './entity/customers.entity';
-import { AuthUser } from './gaurds/auth.decorator';
-import { authUserInterface } from '../gloabl/interface/auth-user.interface';
-import { roleGaurd } from './gaurds/roles.decorator';
-import { updateUserSchema } from 'src/gloabl/globalJob/update-user.job';
 import { addUserDto } from 'src/gloabl/globalDto/add-user.dto';
+import { addUserSchema } from 'src/gloabl/globalJob/add-user.job';
+import { JoiValidationPipe } from 'src/gloabl/globalJob/joi-validation.pipe';
+import { ERole, SellerService } from './seller.service';
+import { loginUserSchema } from 'src/gloabl/globalJob/login-user.job';
 import { loginUserDto } from 'src/gloabl/globalDto/login-user.dto';
+import { AuthGuard } from './gaurds/auth.gaurd';
+import { roleGaurd } from './gaurds/roles.decorator';
+import { AuthUser } from './gaurds/auth.decorator';
+import { Seller } from './entity/sellers.entity';
+import { updateUserSchema } from 'src/gloabl/globalJob/update-user.job';
 import { updateUserPasswordDto } from 'src/gloabl/globalDto/update-user.dto';
-@Controller('customer')
-export class CustomerController {
-  constructor(private readonly customerService: CustomerService) {}
+import { authSellerInterface } from 'src/gloabl/interface/auth-seller.interface';
 
-  @Post('/add-customer')
+@Controller('seller')
+export class SellerController {
+  constructor(private readonly sellerService: SellerService) {}
+
+  @Post('/add-seller')
   @UsePipes(new JoiValidationPipe(addUserSchema))
-  async addCustomer(@Body() addCustomerDto: addUserDto) {
+  async addSeller(@Body() addSellerDto: addUserDto) {
     try {
-      return await this.customerService.addCustomer(addCustomerDto);
+      return await this.sellerService.addSeller(addSellerDto);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -40,21 +40,21 @@ export class CustomerController {
 
   @Post('/login')
   @UsePipes(new JoiValidationPipe(loginUserSchema))
-  async loginCustomer(@Body() loginCustomerDto: loginUserDto) {
-    const user = await this.customerService.validateUSer(loginCustomerDto);
+  async loginSeller(@Body() loginSellerDto: loginUserDto) {
+    const user = await this.sellerService.validateUSer(loginSellerDto);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const token = await this.customerService.loginCustomer(user);
+    const token = await this.sellerService.loginSeller(user);
     return token;
   }
 
   @Get()
   @UseGuards(AuthGuard)
-  @roleGaurd(ERole.customer, ERole.admin)
-  async getCustomer(@AuthUser() user: authUserInterface): Promise<Customer> {
+  @roleGaurd(ERole.seller, ERole.admin)
+  async getSeller(@AuthUser() user: authSellerInterface): Promise<Seller> {
     try {
-      const data = await this.customerService.getCustomer(user);
+      const data = await this.sellerService.getSeller(user);
       return data;
     } catch (error) {
       throw new BadRequestException({
@@ -66,16 +66,16 @@ export class CustomerController {
 
   @Put()
   @UseGuards(AuthGuard)
-  @roleGaurd(ERole.customer, ERole.admin)
+  @roleGaurd(ERole.seller, ERole.admin)
   async updatePassword(
-    @AuthUser() user: authUserInterface,
+    @AuthUser() user: authSellerInterface,
     @Body(new JoiValidationPipe(updateUserSchema))
-    updateCustomerPasswordDto: updateUserPasswordDto,
+    updateSellerPasswordDto: updateUserPasswordDto,
   ): Promise<object> {
     try {
-      const data = await this.customerService.updatePassword(
+      const data = await this.sellerService.updatePassword(
         user,
-        updateCustomerPasswordDto,
+        updateSellerPasswordDto,
       );
       return data;
     } catch (error) {
@@ -88,14 +88,14 @@ export class CustomerController {
 
   @Delete()
   @UseGuards(AuthGuard)
-  @roleGaurd(ERole.customer, ERole.admin)
-  async deleteCustomer(
-    @AuthUser() user: authUserInterface,
+  @roleGaurd(ERole.seller, ERole.admin)
+  async deleteSeller(
+    @AuthUser() user: authSellerInterface,
     @Body(new JoiValidationPipe(loginUserSchema))
     loginCustomerDto: loginUserDto,
   ) {
     try {
-      return await this.customerService.deleteCustomer(user, loginCustomerDto);
+      return await this.sellerService.deleteSeller(user, loginCustomerDto);
     } catch (error) {
       throw new BadRequestException({
         message: 'Error in deleting user ',

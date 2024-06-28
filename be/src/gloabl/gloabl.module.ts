@@ -3,6 +3,7 @@ import { GloablService } from './gloabl.service';
 
 @Module({
   providers: [GloablService],
-  exports:[GloablService]
+  exports:[GloablService],
+  imports:[]
 })
 export class GloablModule {}

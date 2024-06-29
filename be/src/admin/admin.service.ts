@@ -15,6 +15,7 @@ import { authAdminInterface } from 'src/gloabl/interface/auth-admin.interface';
 import { updateUserPasswordDto } from 'src/gloabl/globalDto/update-user.dto';
 import { CustomerService } from 'src/customer/customer.service';
 import { SellerService } from 'src/seller/seller.service';
+import { BikeService } from 'src/bike/bike.service';
 
 export enum ERole {
   admin = 'admin1',
@@ -28,6 +29,7 @@ export class AdminService {
     private globalService: GloablService,
     private customerService: CustomerService,
     private sellerService: SellerService,
+    private BikeService : BikeService,
   ) {}
 
   async addAdmin(addAdminDto: addUserDto): Promise<object> {
@@ -212,6 +214,18 @@ export class AdminService {
     } catch (error) {
       throw new BadRequestException({
         message: 'Error in fetching user ',
+        status: false,
+      });
+    }
+  }
+
+  async fetchAllBikes(){
+    try {
+      const data = await this.BikeService.getAllBike()
+      return data
+    } catch (error) {
+       throw new BadRequestException({
+        message: 'Error in fetching Bikes data ',
         status: false,
       });
     }

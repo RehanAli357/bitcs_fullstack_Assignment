@@ -131,4 +131,18 @@ export class AdminController {
       });
     }
   }
+
+  @Get('/fetch-bike')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.admin)
+  async fetchAllBikes(){
+    try {
+      return this.adminService.fetchAllBikes()
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching bikes data ',
+        status: false,
+      });
+    }
+  }
 }

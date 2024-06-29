@@ -60,4 +60,14 @@ export class BikeService {
       return false;
     }
   }
+
+  async getAllBike(){
+    try {
+      return await this.bikeRepository.find()
+
+    } catch (error) {
+      console.log('Unable to get all Bikes data:', error.message);
+      return false;
+    }
+  }
 }

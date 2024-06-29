@@ -13,6 +13,9 @@ import { loginUserDto } from 'src/gloabl/globalDto/login-user.dto';
 import * as jwt from 'jsonwebtoken';
 import { updateUserPasswordDto } from 'src/gloabl/globalDto/update-user.dto';
 import { authSellerInterface } from 'src/gloabl/interface/auth-seller.interface';
+import { addBikeDto } from 'src/bike/dto/add-bike.dto';
+import { BikeService } from 'src/bike/bike.service';
+import { updateBikeDto } from 'src/bike/dto/update-bike.dto';
 
 export enum ERole {
   seller = 'sel001',
@@ -25,6 +28,7 @@ export class SellerService {
     @InjectRepository(Seller)
     private sellerRepository: Repository<Seller>,
     private globalService: GloablService,
+    private bikeService: BikeService,
   ) {}
 
   async addSeller(addSellerDto: addUserDto): Promise<object> {
@@ -190,13 +194,72 @@ export class SellerService {
     }
   }
 
-  async fetchAllSellers():Promise<Seller[]>{
+  async fetchAllSellers(): Promise<Seller[]> {
     try {
-      return await this.sellerRepository.find()
+      return await this.sellerRepository.find();
     } catch (error) {
       console.log('Error in Fetching users:', error.message);
       throw new BadRequestException({
         message: 'Error in Fetching user',
+        status: false,
+      });
+    }
+  }
+
+  async addBike(user: authSellerInterface, addBikeDto: addBikeDto) {
+    try {
+      let data = {};
+      data = { ...addBikeDto, sId: user.sId, createdTime: new Date() };
+      const isAdded = await this.bikeService.addBike(data);
+      if (isAdded) {
+        return { message: 'Bike Added', status: true };
+      } else {
+        throw new BadRequestException({
+          message: 'Unable to add the data',
+          status: false,
+        });
+      }
+    } catch (error) {
+      console.log('Unable to Save Bike Data', error.message);
+      throw new BadRequestException({
+        message: 'Unable to add the data',
+        status: false,
+      });
+    }
+  }
+
+  async getBike(user: authSellerInterface) {
+    try {
+      const data = await this.bikeService.getBike(user.sId);
+      return data;
+    } catch (error) {
+      console.log('Unable to get Bike Data', error.message);
+      throw new BadRequestException({
+        message: 'Unable to get Bike the data',
+        status: false,
+      });
+    }
+  }
+
+  async updateBike(user: authSellerInterface, updateBikeDto: updateBikeDto) {
+    try {
+      await this.bikeService.updateBike(user, updateBikeDto);
+    } catch (error) {
+      console.log('Unable to update Bike Data', error.message);
+      throw new BadRequestException({
+        message: 'Unable to update Bike the data',
+        status: false,
+      });
+    }
+  }
+
+  async deleteBike(sId: string, bId: string) {
+    try {
+      await this.bikeService.deleteBike(sId, bId);
+    } catch (error) {
+      console.log('Unable to delete Bike Data', error.message);
+      throw new BadRequestException({
+        message: 'Unable to delete Bike the data',
         status: false,
       });
     }

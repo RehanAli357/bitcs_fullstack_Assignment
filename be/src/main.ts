@@ -4,12 +4,18 @@ import * as env from 'dotenv';
 import * as path from 'path';
 
 env.config({
-  path:path.resolve(__dirname,'../.env')
-})  
+  path: path.resolve(__dirname, '../.env'),
+});
 async function bootstrap() {
-
   const app = await NestFactory.create(AppModule);
-  app.enableCors()
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Accept',
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  });
   await app.listen(5000);
 }
 bootstrap();

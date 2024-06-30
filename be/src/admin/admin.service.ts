@@ -73,7 +73,7 @@ export class AdminService {
     try {
       const payload = { aId: user.aId, roleId: user.roleId };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: '60m',
+        expiresIn: '1d',
       });
       return {
         access_token: token,
@@ -221,7 +221,7 @@ export class AdminService {
 
   async fetchAllBikes(){
     try {
-      const data = await this.BikeService.getAllBike()
+      const data = await this.customerService.getAllBike()
       return data
     } catch (error) {
        throw new BadRequestException({

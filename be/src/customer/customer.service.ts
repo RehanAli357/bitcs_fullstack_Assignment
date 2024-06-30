@@ -1,9 +1,10 @@
 import {
   BadRequestException,
-  HttpException,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Customer } from './entity/customers.entity';
@@ -14,6 +15,9 @@ import { authUserInterface } from '../gloabl/interface/auth-user.interface';
 import { addUserDto } from 'src/gloabl/globalDto/add-user.dto';
 import { loginUserDto } from 'src/gloabl/globalDto/login-user.dto';
 import { updateUserPasswordDto } from 'src/gloabl/globalDto/update-user.dto';
+import { BikeService } from 'src/bike/bike.service';
+import { bookBike } from 'src/bike/dto/book-bike.dto';
+import { deleteBikeDto } from 'src/bike/dto/delete-bike.dto';
 
 export enum ERole {
   customer = 'cus001',
@@ -27,6 +31,8 @@ export class CustomerService {
     private customerRepository: Repository<Customer>,
 
     private globalService: GloablService,
+    @Inject(forwardRef(() => BikeService))
+    private BikeService: BikeService,
   ) {}
 
   async addCustomer(addCustomerDto: addUserDto): Promise<Object> {
@@ -73,7 +79,7 @@ export class CustomerService {
     try {
       const payload = { cId: user.cId, roleId: user.roleId };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: '60m',
+        expiresIn: '1d',
       });
       return {
         access_token: token,
@@ -198,13 +204,51 @@ export class CustomerService {
     }
   }
 
-  async fetchAllCustomers():Promise<Customer[]>{
+  async fetchAllCustomers(): Promise<Customer[]> {
     try {
-      return await this.customerRepository.find()
+      return await this.customerRepository.find();
     } catch (error) {
       console.log('Error in Fetching users:', error.message);
       throw new BadRequestException({
         message: 'Error in Fetching user',
+        status: false,
+      });
+    }
+  }
+
+  async getAllBike() {
+    try {
+      return await this.BikeService.getAllBike();
+    } catch (error) {
+      console.log('Error in Fetching bikes data:', error.message);
+      throw new BadRequestException({
+        message: 'Error in Fetching bikes data',
+        status: false,
+      });
+    }
+  }
+
+  async bookBike(user: authUserInterface, bikeIdDto: bookBike) {
+    try {
+      let data = await this.BikeService.bookBike(user, bikeIdDto);
+      if (data) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Unable to book a bike at this moment',
+        status: false,
+      });
+    }
+  }
+
+  async returnBike(user: authUserInterface, bikeDto: deleteBikeDto) {
+    try {
+      await this.BikeService.returnBike(user.cId, bikeDto.bId);
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Failing to return a bike at this moment',
         status: false,
       });
     }

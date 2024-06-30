@@ -16,6 +16,7 @@ import { authSellerInterface } from 'src/gloabl/interface/auth-seller.interface'
 import { addBikeDto } from 'src/bike/dto/add-bike.dto';
 import { BikeService } from 'src/bike/bike.service';
 import { updateBikeDto } from 'src/bike/dto/update-bike.dto';
+import { SellerPaymentService } from './sellerPayment.service';
 
 export enum ERole {
   seller = 'sel001',
@@ -29,6 +30,7 @@ export class SellerService {
     private sellerRepository: Repository<Seller>,
     private globalService: GloablService,
     private bikeService: BikeService,
+    private SellerPaymentService : SellerPaymentService
   ) {}
 
   async addSeller(addSellerDto: addUserDto): Promise<object> {
@@ -72,7 +74,7 @@ export class SellerService {
     try {
       const payload = { sId: user.sId, roleId: user.roleId };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: '60m',
+        expiresIn: '1d',
       });
       return {
         access_token: token,
@@ -211,6 +213,7 @@ export class SellerService {
       let data = {};
       data = { ...addBikeDto, sId: user.sId, createdTime: new Date() };
       const isAdded = await this.bikeService.addBike(data);
+      // const isUpdated = await this.SellerPaymentService.addBikes(sId)
       if (isAdded) {
         return { message: 'Bike Added', status: true };
       } else {

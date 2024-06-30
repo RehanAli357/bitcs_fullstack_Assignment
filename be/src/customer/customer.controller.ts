@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   Post,
   Put,
   Req,
@@ -24,6 +25,13 @@ import { updateUserSchema } from 'src/gloabl/globalJob/update-user.job';
 import { addUserDto } from 'src/gloabl/globalDto/add-user.dto';
 import { loginUserDto } from 'src/gloabl/globalDto/login-user.dto';
 import { updateUserPasswordDto } from 'src/gloabl/globalDto/update-user.dto';
+import { bookBike } from 'src/bike/dto/book-bike.dto';
+import { bookBikeSchema } from 'src/bike/job/book-bike.job';
+import { updateBikeSchema } from 'src/bike/job/update-bike.job';
+import { updateBikeDto } from 'src/bike/dto/update-bike.dto';
+import { deleteBikeDto } from 'src/bike/dto/delete-bike.dto';
+import { deleteBikeSchema } from 'src/bike/job/delete-bike.job';
+import { retry } from 'rxjs';
 @Controller('customer')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
@@ -99,6 +107,65 @@ export class CustomerController {
     } catch (error) {
       throw new BadRequestException({
         message: 'Error in deleting user ',
+        status: false,
+      });
+    }
+  }
+
+  @Get('/get-Bikes')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.customer)
+  async getAllBike() {
+    try {
+      return this.customerService.getAllBike();
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching bikes data ',
+        status: false,
+      });
+    }
+  }
+
+  @Put('/book-bike')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.customer)
+  async bookBike(
+    @AuthUser() user: authUserInterface,
+    @Body(new JoiValidationPipe(bookBikeSchema)) bikeIdDto: bookBike,
+  ) {
+    try {
+      const result = await this.customerService.bookBike(user, bikeIdDto);
+
+      if (!result) {
+        throw new BadRequestException({
+          message: 'Error in booking bike',
+          status: false,
+        });
+      }
+
+      return { message: 'Your ride is booked successfully', status: true };
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in booking bike',
+        status: false,
+      });
+    }
+  }
+
+  @Put('/return-bike')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.customer)
+  async returnBike(
+    @AuthUser() user: authUserInterface,
+    @Body(new JoiValidationPipe(deleteBikeSchema)) bikeIdDto: deleteBikeDto,
+  ) {
+    try {
+      await this.customerService.returnBike(user, bikeIdDto);
+      return { message: 'Successfully Returned', status: true };
+    } catch (error) {
+      console.log(error.message);
+      throw new BadRequestException({
+        message: 'Error in Returning bike',
         status: false,
       });
     }

@@ -11,9 +11,6 @@ export class addBikeDto {
   @IsNumber()
   bPrice: number;
 
-  @IsNumber()
-  bDistance:number;
-
   @IsBoolean()
   available:boolean;
 

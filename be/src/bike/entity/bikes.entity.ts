@@ -14,9 +14,6 @@ export class Bike {
 
   @Column()
   bPrice: number;
-  
-  @Column()
-  bDistance:number;
 
   @Column()
   available: boolean;
@@ -27,6 +24,9 @@ export class Bike {
   @Column()
   sId:string;
 
+  @Column()
+  cId:string;
+  
   @Column()
   createdTime: Date;
 }

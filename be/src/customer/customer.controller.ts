@@ -4,6 +4,8 @@ import {
   Delete,
   Get,
   HttpException,
+  NotFoundException,
+  Param,
   Post,
   Put,
   Req,
@@ -123,6 +125,22 @@ export class CustomerController {
         message: 'Error in fetching bikes data ',
         status: false,
       });
+    }
+  }
+
+
+  @Get('/get-bike/:id')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.customer)
+  async getBike(@Param('id') id: string) {
+    try {
+      const bikeIdDto = new deleteBikeDto();
+      bikeIdDto.bId = id;
+      
+      return await this.customerService.getBike(bikeIdDto)
+    } catch (error) {
+      console.error('Error fetching bike data:', error.message);
+      throw new NotFoundException('Error occurred while retrieving bike data');
     }
   }
 

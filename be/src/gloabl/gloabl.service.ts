@@ -12,6 +12,7 @@ export class GloablService {
     return hash;
   }
 
+  
   async compareHash(password, hashPassword): Promise<boolean> {
     const isMatch = await bcrypt.compare(password, hashPassword);
     if (isMatch) {
@@ -21,7 +22,7 @@ export class GloablService {
     }
   }
 
-  async addUser(user: addUserDto, type): Promise<object> {
+  async addUser(user: addUserDto, type:string): Promise<object> {
     const hashPassword = await this.createHash(user.password);
     if (type === 'customer') {
       const customer = {

@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  ParseIntPipe,
   UnauthorizedException,
   forwardRef,
 } from '@nestjs/common';
@@ -228,6 +229,18 @@ export class CustomerService {
     }
   }
 
+  async getBike(id:deleteBikeDto){
+    try {
+      return await this.BikeService.getBikeData(id)
+    } catch (error) {
+      console.log('Error in Fetching bike details:', error.message);
+      throw new BadRequestException({
+        message: 'Error in Fetching bike details',
+        status: false,
+      });
+    }
+  }
+
   async bookBike(user: authUserInterface, bikeIdDto: bookBike) {
     try {
       let data = await this.BikeService.bookBike(user, bikeIdDto);
@@ -248,7 +261,7 @@ export class CustomerService {
       await this.BikeService.returnBike(user.cId, bikeDto.bId);
     } catch (error) {
       throw new BadRequestException({
-        message: 'Failing to return a bike at this moment',
+        message: 'Unable to return a bike at this moment',
         status: false,
       });
     }

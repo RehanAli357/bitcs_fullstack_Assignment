@@ -30,7 +30,12 @@ export class CustomerPaymentService {
   }
 
   async fetchPayment(cId:string){
-    this.CustomerPaymentRepository.find({where:{cId:cId}})
+    try {
+      return await this.CustomerPaymentRepository.find({where:{cId:cId}})
+    } catch (error) {
+      console.log('Unable to add paymentCustomer data:', error.message);
+      return false;
+    }
   }
   async fetchAllPayment(){
     this.CustomerPaymentRepository.find()

@@ -65,15 +65,18 @@ export class BikeService {
   async addBikeTaken(bId: string, sId: string, createdTime: Date) {
     try {
       let bikeTakenData = {};
+      const btId=uuidv4()
+      console.log(btId)
       bikeTakenData = {
         bId: bId,
-        btId: uuidv4(),
+        btId: btId,
         sId: sId,
         bIncome: 0,
         bTime: 0,
         createdTime: createdTime,
       };
-      await this.bikeTakenRepository.save(bikeTakenData);
+      const data=await this.bikeTakenRepository.save(bikeTakenData);
+      console.log(data,"\n",bikeTakenData)
       return true;
     } catch (error) {
       console.log('Unable to get Bike:', error.message);
@@ -115,11 +118,11 @@ export class BikeService {
         available: false,
       });
       console.log('Bike availability updated');
-  
+
       const bikeTakenData = await this.bikeTakenRepository.findOne({
         where: { bId: data.bId },
       });
-  
+
       if (!bikeTakenData) {
         console.log('No bike taken data found for bike ID:', data.bId);
         return false;
@@ -127,32 +130,33 @@ export class BikeService {
 
       bikeTakenData.bIncome += data.bPrice * bikeDto.bTime;
       bikeTakenData.bTime += bikeDto.bTime;
-  
+
       data.cId = user.cId;
       await this.bikeRepository.save(data);
       console.log('Bike data updated');
-  
+
       await this.bikeTakenRepository.save(bikeTakenData);
       console.log('Bike taken data updated');
-  
+
       await this.customerPaymentService.addPayment(
         user.cId,
         bikeDto.bId,
         data.bPrice * bikeDto.bTime,
-        bikeDto.bTime
+        bikeDto.bTime,
       );
       console.log('Payment added');
-  
+
       return true;
     } catch (error) {
       console.log('Unable to update BikeTaken data:', error.message);
       return false;
     }
   }
-  
+
   async deleteBike(sId: string, bId: string): Promise<boolean> {
     try {
       await this.bikeRepository.delete({ sId, bId });
+      await this.bikeTakenRepository.delete({ sId, bId });
       return true;
     } catch (error) {
       console.log('Unable to update Bike:', error.message);
@@ -202,16 +206,36 @@ export class BikeService {
     }
   }
 
-  async returnBike(cId:string,bId:string) {
+  async returnBike(cId: string, bId: string) {
     try {
       await this.bikeRepository.update(bId, {
         available: true,
-        cId:''
+        cId: '',
       });
-      return true
+      return true;
     } catch (error) {
       console.log('Unable to get bike data:', error.message);
-      return false      
+      return false;
+    }
+  }
+
+  async getBookedBike(cId: string) {
+    try {
+      const data = await this.bikeRepository.find({ where: { cId } });
+      return data;
+    } catch (error) {
+      console.log('Unable to get booked bike data:', error.message);
+      return false;
+    }
+  }
+
+  async getBikeTaken(sId: string) {
+    try {
+      const data = await this.bikeTakenRepository.find({ where: { sId } });
+      return data;
+    } catch (error) {
+      console.log('Unable to get all bike data of seller:', error.message);
+      return false;
     }
   }
 }

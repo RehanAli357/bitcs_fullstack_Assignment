@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useParams } from "react-router-dom";
 import commonAxios from "../Global/CommonAxios/commonAxios";
 import Modal from "react-modal";
 import { ToastContainer, toast } from "react-toastify";
+import { UserContext } from "../Context/userContext";
 
 Modal.setAppElement("#root");
 
@@ -12,7 +13,9 @@ const BikePage = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [rentalHours, setRentalHours] = useState(1);
   const { id } = useParams();
-  const [cookies] = useCookies(["accessToken"]);
+  const [cookies] = useCookies(["accessToken","roleId"]);
+
+  const user = useContext(UserContext);
 
   const getBikeData = async () => {
     try {
@@ -48,15 +51,16 @@ const BikePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(rentalHours, bikeData.bId);
-    const payload = { bId: bikeData.bId, bTime: rentalHours };
+    const payload = { bId: bikeData.bId, bTime: +rentalHours };
     const response = await commonAxios(
-      `customer/book-bike`,
+      `customer/rent-bike`,
       "PUT",
       payload,
       cookies.accessToken
     );
     if (response.status === 200) {
       toast.success(response.data.message);
+      getBikeData();
     } else {
       toast.error(
         response.response.data.message ||
@@ -69,28 +73,31 @@ const BikePage = () => {
   const renderBikeDetails = () => {
     return (
       <div className="bike-details">
-        <h2>{bikeData.bName}</h2>
-        {bikeData.bImage ? (
-          <img src={bikeData.bImage} alt={bikeData.bName} />
+        <h2>{bikeData?.bName}</h2>
+        {bikeData?.bImage ? (
+          <img src={bikeData?.bImage} alt={bikeData?.bName} />
         ) : (
           <p>No Image Uploaded Yet</p>
         )}
-        <p>{bikeData.bPrice}</p>
-        <p>{bikeData.bType}</p>
-        {bikeData.available===true && bikeData.cId.length>0? (
-          <button
-            className="primary-btn secondary-btn"
-            onClick={handleRentClick}
-          >
-            Rent a Bike
-          </button>
+        <p>{bikeData?.bPrice}</p>
+        <p>{bikeData?.bType}</p>
+        {bikeData?.available === true && (bikeData?.cId?.length <= 0 || bikeData.cId===null) ? (
+          cookies.roleId === "cus001" ? (
+            <button
+              className="primary-btn secondary-btn"
+              onClick={handleRentClick}
+            >
+              Rent a Bike
+            </button>
+          ) : (
+            <p>Bike is Available</p>
+          )
         ) : (
           <p>Bike is Not Available</p>
         )}
       </div>
     );
   };
-
   const rentaBike = () => {
     console.log(bikeData.bId, rentalHours);
   };
@@ -118,7 +125,7 @@ const BikePage = () => {
         className="modal"
         overlayClassName="modal-overlay"
       >
-        <h2>Rent {bikeData.bName}</h2>
+        <h2>Rent {bikeData?.bName}</h2>
         <form onSubmit={handleSubmit} className="rent-bike-form">
           <label htmlFor="rentalHours">Rental Hours:</label>
           <input
@@ -132,7 +139,7 @@ const BikePage = () => {
           />
           <span>
             {rentalHours} hour{rentalHours > 1 ? "s" : ""} X &#8377;{" "}
-            {bikeData.bPrice} = &#8377;{rentalHours * bikeData.bPrice}
+            {bikeData?.bPrice} = &#8377;{rentalHours * bikeData?.bPrice}
           </span>
           <button type="submit" className="primary-btn secondary-btn">
             Submit

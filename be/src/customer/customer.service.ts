@@ -19,10 +19,12 @@ import { updateUserPasswordDto } from 'src/gloabl/globalDto/update-user.dto';
 import { BikeService } from 'src/bike/bike.service';
 import { bookBike } from 'src/bike/dto/book-bike.dto';
 import { deleteBikeDto } from 'src/bike/dto/delete-bike.dto';
+import { CustomerPaymentService } from './customerPayment.service';
 
 export enum ERole {
   customer = 'cus001',
   admin = 'adm001',
+  seller='sel001'
 }
 
 @Injectable()
@@ -32,6 +34,7 @@ export class CustomerService {
     private customerRepository: Repository<Customer>,
 
     private globalService: GloablService,
+    private customerPaymentService : CustomerPaymentService,
     @Inject(forwardRef(() => BikeService))
     private BikeService: BikeService,
   ) {}
@@ -259,6 +262,31 @@ export class CustomerService {
   async returnBike(user: authUserInterface, bikeDto: deleteBikeDto) {
     try {
       await this.BikeService.returnBike(user.cId, bikeDto.bId);
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Unable to return a bike at this moment',
+        status: false,
+      });
+    }
+  }
+
+  async getBookedBike(cId:string){
+    try {
+      const data = await this.BikeService.getBookedBike(cId)
+      return data
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Unable to return a bike at this moment',
+        status: false,
+      });
+      
+    }
+  }
+
+  async fetchPayment(cId:string){
+    try {
+      const data = await this.customerPaymentService.fetchPayment(cId)
+      return data
     } catch (error) {
       throw new BadRequestException({
         message: 'Unable to return a bike at this moment',

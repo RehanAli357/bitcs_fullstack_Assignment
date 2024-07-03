@@ -258,11 +258,23 @@ export class SellerService {
 
   async deleteBike(sId: string, bId: string) {
     try {
-      await this.bikeService.deleteBike(sId, bId);
+     return await this.bikeService.deleteBike(sId, bId);
     } catch (error) {
       console.log('Unable to delete Bike Data', error.message);
       throw new BadRequestException({
         message: 'Unable to delete Bike the data',
+        status: false,
+      });
+    }
+  }
+
+  async getBikeTaken(sId:string){
+    try {
+     return await this.bikeService.getBikeTaken(sId)
+    } catch (error) {
+      console.log('Unable to get seller Bike Data', error.message);
+      throw new BadRequestException({
+        message: 'Unable to get seller Bike the data',
         status: false,
       });
     }

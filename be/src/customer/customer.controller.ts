@@ -131,7 +131,7 @@ export class CustomerController {
 
   @Get('/get-bike/:id')
   @UseGuards(AuthGuard)
-  @roleGaurd(ERole.customer)
+  @roleGaurd(ERole.customer,ERole.seller)
   async getBike(@Param('id') id: string) {
     try {
       const bikeIdDto = new deleteBikeDto();
@@ -144,7 +144,7 @@ export class CustomerController {
     }
   }
 
-  @Put('/book-bike')
+  @Put('/rent-bike')
   @UseGuards(AuthGuard)
   @roleGaurd(ERole.customer)
   async bookBike(
@@ -184,6 +184,36 @@ export class CustomerController {
       console.log(error.message);
       throw new BadRequestException({
         message: 'Error in Returning bike',
+        status: false,
+      });
+    }
+  }
+
+  @Get('/booked-bike')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.customer)
+  async getBookedBike(@AuthUser() user:authUserInterface){
+    try {
+      return this.customerService.getBookedBike(user.cId)
+    } catch (error) {
+      console.log(error.message);
+      throw new BadRequestException({
+        message: 'Error in getting booked bike data',
+        status: false,
+      });
+    }
+  }
+
+  @Get('/fetch-payment')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.customer)
+  async fetchPayment(@AuthUser() user:authUserInterface){
+    try {
+      return this.customerService.fetchPayment(user.cId)
+    } catch (error) {
+      console.log(error.message);
+      throw new BadRequestException({
+        message: 'Error in fetching payment history',
         status: false,
       });
     }

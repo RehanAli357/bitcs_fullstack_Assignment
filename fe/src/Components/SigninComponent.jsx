@@ -89,6 +89,21 @@ const SignIn = () => {
           >
             Sign In as Seller
           </button>
+          <p
+            style={{
+              textAlign: "center",
+              color: "blue",
+              cursor: "pointer",
+              marginTop: "15px",
+              textDecoration: "underline",
+              fontSize: "10px",
+            }}
+            onClick={() => {
+              navigate("/login");
+            }}
+          >
+            Already have Account &rarr;
+          </p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="signin-form">
@@ -133,6 +148,21 @@ const SignIn = () => {
           <button type="submit" className="primary-btn">
             Sign In
           </button>
+          <p
+            style={{
+              textAlign: "center",
+              color: "blue",
+              cursor: "pointer",
+              marginTop: "15px",
+              textDecoration: "underline",
+              fontSize: "10px",
+            }}
+            onClick={() => {
+              navigate("/login");
+            }}
+          >
+            Already have Account &rarr;
+          </p>
         </form>
       )}
     </div>

@@ -184,4 +184,19 @@ export class SellerController {
       });
     }
   }
+
+  @Get('/get-bike-taken')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.seller)
+  async getBikeTaken(@AuthUser() user:authSellerInterface){
+    try {
+      return await this.sellerService.getBikeTaken(user.sId)
+    } catch (error) {
+      console.log('Unable to get seller Bike data:', error.message);
+      throw new BadRequestException({
+        message: 'Unable to get seller Bike ',
+        status: false,
+      });
+    }
+  }
 }

@@ -103,76 +103,103 @@
 
 /*SiginInComponent---------------------------------------------*/
 
+/* HomePage.css */
+
 .home-container {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.loading {
-  text-align: center;
-  font-size: 18px;
-  color: #007bff;
+.return-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
 }
 
-.error {
-  text-align: center;
-  font-size: 18px;
-  color: #dc3545;
+.return-button {
+  background-color: red;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.no-data {
+.header {
   text-align: center;
-  font-size: 18px;
-  color: #6c757d;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  color: #333;
 }
 
 .bike-cards {
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
   gap: 20px;
-  justify-content: center;
 }
 
 .bike-card {
+  background-color: #f9f9f9;
   border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px;
-  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 300px;
-  text-align: center;
-  transition: transform 0.3s, box-shadow 0.3s;
-  cursor: pointer;
+  transition: transform 0.2s;
+  width:300px
 }
 
 .bike-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.bike-card img {
+.bike-image {
   width: 100%;
-  height: auto;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  height: 200px;
+  object-fit: cover;
 }
 
-.no-image {
-  font-style: italic;
-  color: #999;
+.bike-info {
+  padding: 15px;
 }
 
 .bike-name {
-  font-size: 18px;
+  font-size: 1.5rem;
   font-weight: bold;
-  margin: 10px 0;
+  margin-bottom: 10px;
 }
 
 .bike-price {
-  font-size: 16px;
-  color: #007bff;
+  font-size: 1.2rem;
+  color: #555;
 }
+
+.bike-actions {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  padding: 15px;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+}
+
+.unavailable {
+  margin: 10px 0;
+  color: red;
+}
+
+.no-data, .loading {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 20px;
+  color: #777;
+}
+
 
 /*HomePage------------------------------------------------------*/
 
@@ -286,3 +313,397 @@
 }
 
 /*BikePage------------------------------------------------------*/
+
+.navigation-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+}
+
+.nav-logo img {
+  height: 40px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+}
+
+.nav-links a {
+  color: #fff;
+  text-decoration: none;
+  margin: 0 15px;
+  font-size: 18px;
+}
+
+.nav-links a:hover {
+  text-decoration: underline;
+}
+
+.nav-links .active-link {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.user-profile {
+  margin-left: 20px;
+}
+
+.user-profile img {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-profile .active-link img {
+  border: 2px solid #fff;
+}
+
+/*Navigation Bar------------------------------------------------------*/
+
+/* AboutPage.css */
+
+.about-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.about-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.about-header h1 {
+  font-size: 2.5rem;
+  color: #333;
+}
+
+.about-content {
+  margin-bottom: 40px;
+}
+
+.about-content p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.about-team {
+  text-align: center;
+}
+
+.about-team h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.team-members {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.team-member {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 250px;
+  text-align: center;
+  padding: 20px;
+}
+
+.team-member img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.team-member h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.team-member p {
+  font-size: 1rem;
+  color: #777;
+}
+
+/*About Page------------------------------------*/
+
+/* ContactPage.css */
+
+.contact-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.contact-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.contact-header h1 {
+  font-size: 2.5rem;
+  color: #333;
+}
+
+.contact-content {
+  margin-bottom: 40px;
+}
+
+.contact-content p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.contact-info {
+  margin-bottom: 40px;
+}
+
+.contact-info h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.contact-info p {
+  font-size: 1.1rem;
+  color: #777;
+  margin-bottom: 5px;
+}
+
+.contact-form h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: #333;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #007BFF;
+}
+
+/*Contact Page----------------------------------*/
+
+.profile-page {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.profile-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+}
+
+.profile-name,
+.profile-email {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.update-password {
+  margin-bottom: 20px;
+}
+
+.update-password p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.update-password input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.primary-btn,
+.secondary-btn,
+.danger-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 10px;
+}
+
+.primary-btn {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.primary-btn:hover {
+  background-color: #0056b3;
+}
+
+.secondary-btn {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.secondary-btn:hover {
+  background-color: #218838;
+}
+
+.danger-btn {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.danger-btn:hover {
+  background-color: #c82333;
+}
+
+.payment-history {
+  margin-top: 20px;
+}
+
+.payment-history h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.payment-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.payment-row {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.payment-row.header {
+  background-color: #f2f2f2;
+}
+
+.payment-cell {
+  flex: 1;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+  text-align: left;
+}
+
+.payment-cell:last-child {
+  border-right: none;
+}
+
+.no-data {
+  text-align: center;
+  font-size: 1rem;
+  color: #555;
+  padding: 10px;
+}
+
+
+/*Profile Page-------------------------------*/
+
+.bike-form-container {
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 8px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"],
+button {
+  margin-bottom: 12px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+button {
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+input[type="file"] {
+  padding: 6px;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+/*BikeFormComponent----------------------------------------*/

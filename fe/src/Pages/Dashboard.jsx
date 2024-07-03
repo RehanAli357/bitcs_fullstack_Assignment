@@ -5,40 +5,30 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import BikeComponent from "../Components/BikeComponent";
 
-const HomePage = () => {
-  const [allBikes, setAllBikes] = useState([]);
+const DashboardPage = () => {
+  const [allBikes, setBikeData] = useState([]);
   const [cookies] = useCookies(["accessToken"]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
   const getItem = async () => {
-    try {
-      const response = await commonAxios(
-        "customer/get-bikes",
-        "GET",
-        {},
-        cookies.accessToken
-      );
-      if (response.status === 200) {
-        setAllBikes(response.data);
-      } else {
-        toast.error(
-          response.response.data.message ||
-          "An error occurred while fetching bikes."
-        );
-      }
-    } catch (err) {
-      console.log(err.message);
-    } finally {
-      setLoading(false);
+    const response = await commonAxios(
+      "seller/get-bike",
+      "GET",
+      {},
+      cookies.accessToken
+    );
+    if (response.status === 200) {
+      setBikeData(response.data);
+      setLoading(false)
+    } else {
+      toast.error(response.response.data.message);
     }
   };
-
   useEffect(() => {
     if (cookies.accessToken) {
       getItem();
-    }else{
-      navigate("/login")
+    } else {
+      navigate("/login");
     }
   }, [cookies.accessToken]);
 
@@ -48,13 +38,15 @@ const HomePage = () => {
       <div className="return-button-container">
         <button
           className="return-button"
-          onClick={() => { navigate("/return") }}
+          onClick={() => {
+            navigate("/add-bike");
+          }}
         >
-          Return Bike
+          Add Bike
         </button>
       </div>
       <div className="header">
-        <h1>Explore all the different types of bikes</h1>
+        <h1>See All Your Bikes Data</h1>
       </div>
       {loading ? (
         <p className="loading">Loading...</p>
@@ -62,7 +54,9 @@ const HomePage = () => {
         <>
           {allBikes.length > 0 ? (
             <div className="bike-cards">
-              {allBikes.map((data) => <BikeComponent data={data} />)}
+              {allBikes.map((data) => {
+                return <BikeComponent data={data}  getItem={getItem}/>;
+              })}
             </div>
           ) : (
             <p className="no-data">No Data Found</p>
@@ -73,4 +67,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default DashboardPage;

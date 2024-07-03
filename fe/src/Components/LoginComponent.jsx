@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { logInSchema } from "../Schema/loginSchema";
 import { hashPassowrd } from "../Global/PasswordHash/encryptionPassword";
 import commonAxios from "../Global/CommonAxios/commonAxios";
@@ -6,6 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import "react-toastify/dist/ReactToastify.css";
+import { UserContext } from "../Context/userContext";
 const Login = ({ signinAs }) => {
   const [formData, setFormData] = useState({
     email: "",
@@ -13,8 +14,9 @@ const Login = ({ signinAs }) => {
   });
   const [errors, setErrors] = useState({});
   const [loginAs, setLoginAs] = useState(signinAs);
-  const [cookies, setCookie] = useCookies(["accessToken"]);
+  const [cookies, setCookie] = useCookies(["accessToken","roleId"]);
   const navigate = useNavigate();
+  const user = useContext(UserContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,8 +63,33 @@ const Login = ({ signinAs }) => {
       }
 
       if (response.status === 201) {
-        navigate("/home");
         setCookie("accessToken", response.data.access_token);
+        const res = await commonAxios(
+          loginAs,
+          "GET",
+          {},
+          response.data.access_token
+        );
+        if (res.status === 200) {
+          if (loginAs === "customer") {
+            user.setData({
+              name: res.data.cName,
+              id: res.data.cId,
+              role: res.data.roleId,
+              email: res.data.cEmail,
+            });
+            navigate("/home");
+          } else if (loginAs === "seller") {
+            navigate("/dashboard");
+            user.setData({
+              name: res.data.sName,
+              id: res.data.sId,
+              role: res.data.roleId,
+              email: res.data.sEmail,
+            });
+          }
+          setCookie("roleId",res.data.roleId)
+        }
       } else {
         toast.error(
           response.response.data.message ||
@@ -78,7 +105,6 @@ const Login = ({ signinAs }) => {
       });
     }
   };
-
   return (
     <div className="main-container">
       <ToastContainer />
@@ -132,6 +158,21 @@ const Login = ({ signinAs }) => {
             Login as Customer
           </p>
         )}
+        <p
+          style={{
+            textAlign: "center",
+            color: "blue",
+            cursor: "pointer",
+            marginTop: "15px",
+            textDecoration: "underline",
+            fontSize: "10px",
+          }}
+          onClick={() => {
+            navigate("/siginin");
+          }}
+        >
+          Create New Account &rarr;
+        </p>
       </form>
     </div>
   );

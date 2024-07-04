@@ -79,7 +79,7 @@ const BikePage = () => {
         ) : (
           <p>No Image Uploaded Yet</p>
         )}
-        <p>{bikeData?.bPrice}</p>
+        <p>&#8377;{bikeData?.bPrice}</p>
         <p>{bikeData?.bType}</p>
         {bikeData?.available === true && (bikeData?.cId?.length <= 0 || bikeData.cId===null) ? (
           cookies.roleId === "cus001" ? (

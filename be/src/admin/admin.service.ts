@@ -29,12 +29,23 @@ export class AdminService {
     private globalService: GloablService,
     private customerService: CustomerService,
     private sellerService: SellerService,
-    private BikeService : BikeService,
+    private BikeService: BikeService,
   ) {}
 
   async addAdmin(addAdminDto: addUserDto): Promise<object> {
     try {
+      const existingCustomer = await this.adminRepository.find({
+        where: { aEmail: addAdminDto.email },
+      });
+
+      if (existingCustomer.length > 0) {
+        throw new BadRequestException({
+          message: 'This account is already taken',
+          status: false,
+        });
+      }
       const admin = await this.globalService.addUser(addAdminDto, 'admin');
+
       await this.adminRepository.save(admin);
       return {
         message: 'Added Successfully',
@@ -207,10 +218,21 @@ export class AdminService {
     }
   }
 
-  async fetchAllSeller(){
+  async fetchCustomerCount() {
+    try {
+      const data = await this.customerService.fetchCustomerCount();
+      return data;
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching customer count',
+        status: false,
+      });
+    }
+  }
+  async fetchAllSeller() {
     try {
       const data = await this.sellerService.fetchAllSellers();
-      return data
+      return data;
     } catch (error) {
       throw new BadRequestException({
         message: 'Error in fetching user ',
@@ -219,16 +241,86 @@ export class AdminService {
     }
   }
 
-  async fetchAllBikes(){
+  async fetchSellerCount() {
     try {
-      const data = await this.customerService.getAllBike()
-      return data
+      const data = await this.sellerService.fetchSellerCount();
+      return data;
     } catch (error) {
-       throw new BadRequestException({
+      throw new BadRequestException({
+        message: 'Error in fetching seller count ',
+        status: false,
+      });
+    }
+  }
+
+  async fetchAllCustomerRevenue() {
+    try {
+      const data = await this.customerService.fetchAllCustomerRevenue();
+      return data;
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching seller count ',
+        status: false,
+      });
+    }
+  }
+
+  async FetchCustomerDetailsRevenue() {
+    try {
+      const data = await this.customerService.FetchCustomerDetailsRevenue();
+      return data;
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching customer revenue data ',
+        status: false,
+      });
+    }
+  }
+
+  async fetchAllSellerRevenue() {
+    try {
+      const data = await this.BikeService.fetchAllSellerRevenue();
+      return data;
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching seller revenue ',
+        status: false,
+      });
+    }
+  }
+
+  async FetchSellerDetailsRevenue() {
+    try {
+      const data = await this.sellerService.FetchSellerDetailsRevenue();
+      return data;
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching Seller revenue data ',
+        status: false,
+      });
+    }
+  }
+  async fetchAllBikes() {
+    try {
+      const data = await this.customerService.getAllBike();
+      return data;
+    } catch (error) {
+      throw new BadRequestException({
         message: 'Error in fetching Bikes data ',
         status: false,
       });
     }
   }
 
+  async fetchBikeCount() {
+    try {
+      const data = await this.BikeService.fetchBikeCount();
+      return data;
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching Bikes data ',
+        status: false,
+      });
+    }
+  }
 }

@@ -118,6 +118,35 @@ export class AdminController {
     }
   }
 
+  @Get('/fetch-customer-count')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.admin)
+  async fetchCustomerCount(){
+    try {
+      return await this.adminService.fetchCustomerCount()
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching user count',
+        status: false,
+      });
+    }
+  }
+
+  @Get('/fetch-customer-revenue')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.admin)
+  async fetchAllCustomerRevenue(){
+    try {
+      return await this.adminService.fetchAllCustomerRevenue()
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching customers revenue ',
+        status: false,
+      });
+    }
+  }
+
+
   @Get('/fetch-seller')
   @UseGuards(AuthGuard)
   @roleGaurd(ERole.admin)
@@ -127,6 +156,33 @@ export class AdminController {
     } catch (error) {
       throw new BadRequestException({
         message: 'Error in fetching user ',
+        status: false,
+      });
+    }
+  }
+  @Get('/fetch-seller-count')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.admin)
+  async fetchSellerCount(){
+    try {
+      return await this.adminService.fetchSellerCount()
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching user count',
+        status: false,
+      });
+    }
+  }
+
+  @Get('/fetch-seller-revenue')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.admin)
+  async fetchAllSellerRevenue(){
+    try {
+      return await this.adminService.fetchAllSellerRevenue()
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching Sellers revenue ',
         status: false,
       });
     }
@@ -141,6 +197,48 @@ export class AdminController {
     } catch (error) {
       throw new BadRequestException({
         message: 'Error in fetching bikes data ',
+        status: false,
+      });
+    }
+  }
+
+  @Get('/fetch-bike-count')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.admin)
+  async fetchBikeCount(){
+    try {
+      return await this.adminService.fetchBikeCount()
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching user count',
+        status: false,
+      });
+    }
+  }
+
+  @Get('/customer-revenue')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.admin)
+  async FetchCustomerDetailsRevenue(){
+    try {
+      return await this.adminService.FetchCustomerDetailsRevenue()
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching customer detail revenue',
+        status: false,
+      });
+    }
+  }
+
+  @Get('/seller-revenue')
+  @UseGuards(AuthGuard)
+  @roleGaurd(ERole.admin)
+  async FetchSellerDetailsRevenue(){
+    try {
+      return await this.adminService.FetchSellerDetailsRevenue()
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Error in fetching Seller detail revenue',
         status: false,
       });
     }

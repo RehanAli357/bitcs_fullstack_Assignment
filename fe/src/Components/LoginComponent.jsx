@@ -14,7 +14,7 @@ const Login = ({ signinAs }) => {
   });
   const [errors, setErrors] = useState({});
   const [loginAs, setLoginAs] = useState(signinAs);
-  const [cookies, setCookie] = useCookies(["accessToken","roleId"]);
+  const [cookies, setCookie] = useCookies(["accessToken", "roleId"]);
   const navigate = useNavigate();
   const user = useContext(UserContext);
 
@@ -60,6 +60,8 @@ const Login = ({ signinAs }) => {
         response = await commonAxios("customer/login", "POST", formData);
       } else if (loginAs === "seller") {
         response = await commonAxios("seller/login", "POST", formData);
+      }else{
+        response  = await commonAxios ("admin/login","POST",formData)
       }
 
       if (response.status === 201) {
@@ -87,8 +89,16 @@ const Login = ({ signinAs }) => {
               role: res.data.roleId,
               email: res.data.sEmail,
             });
+          }else{
+            navigate("/admin-panel");
+            user.setData({
+              name:res.data.aName,
+              id:res.data.aId,
+              role:res.data.roleId,
+              email:res.data.aEmail,
+            })
           }
-          setCookie("roleId",res.data.roleId)
+          setCookie("roleId", res.data.roleId);
         }
       } else {
         toast.error(
@@ -110,7 +120,7 @@ const Login = ({ signinAs }) => {
       <ToastContainer />
 
       <form onSubmit={handleSubmit} className="signin-form">
-        <h2>Login In as {loginAs}</h2>
+        <h2>Login as {loginAs}</h2>
 
         <div className="form-group">
           <label>Email</label>
@@ -137,18 +147,29 @@ const Login = ({ signinAs }) => {
           )}
         </div>
         <button type="submit" className="primary-btn">
-          Login In
+          Login
         </button>
         {loginAs === "customer" ? (
-          <p
-            onClick={() => {
-              setLoginAs("seller");
-            }}
-            style={{ textAlign: "center", color: "blue", cursor: "pointer" }}
-          >
-            Login as Seller
-          </p>
-        ) : (
+          <>
+            <p
+              onClick={() => {
+                setLoginAs("seller");
+              }}
+              style={{ textAlign: "center", color: "blue", cursor: "pointer" }}
+            >
+              Login as Seller
+            </p>
+            <p
+              onClick={() => {
+                setLoginAs("admin");
+              }}
+              style={{ textAlign: "center", color: "blue", cursor: "pointer" }}
+            >
+              Login as Admin
+            </p>
+          </>
+        ) : loginAs==="admin" ? (
+          <>
           <p
             onClick={() => {
               setLoginAs("customer");
@@ -157,7 +178,34 @@ const Login = ({ signinAs }) => {
           >
             Login as Customer
           </p>
-        )}
+          <p
+            onClick={() => {
+              setLoginAs("seller");
+            }}
+            style={{ textAlign: "center", color: "blue", cursor: "pointer" }}
+          >
+            Login as Seller
+          </p>
+          </>
+        ):(
+        <>
+        <p
+            onClick={() => {
+              setLoginAs("customer");
+            }}
+            style={{ textAlign: "center", color: "blue", cursor: "pointer" }}
+          >
+            Login as Customer
+          </p>
+          <p
+            onClick={() => {
+              setLoginAs("admin");
+            }}
+            style={{ textAlign: "center", color: "blue", cursor: "pointer" }}
+          >
+            Login as Admin
+          </p>
+        </>)}
         <p
           style={{
             textAlign: "center",

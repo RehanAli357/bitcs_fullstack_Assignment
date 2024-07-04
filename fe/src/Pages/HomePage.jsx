@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import BikeComponent from "../Components/BikeComponent";
 
-const HomePage = () => {
+const HomePage = ({ type }) => {
   const [allBikes, setAllBikes] = useState([]);
   const [cookies] = useCookies(["accessToken"]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +14,7 @@ const HomePage = () => {
   const getItem = async () => {
     try {
       const response = await commonAxios(
-        "customer/get-bikes",
+        `${type === "admin" ? "admin/fetch-bike" : "customer/get-bikes"}`,
         "GET",
         {},
         cookies.accessToken
@@ -24,7 +24,7 @@ const HomePage = () => {
       } else {
         toast.error(
           response.response.data.message ||
-          "An error occurred while fetching bikes."
+            "An error occurred while fetching bikes."
         );
       }
     } catch (err) {
@@ -37,22 +37,28 @@ const HomePage = () => {
   useEffect(() => {
     if (cookies.accessToken) {
       getItem();
-    }else{
-      navigate("/login")
+    } else {
+      navigate("/login");
     }
   }, [cookies.accessToken]);
 
   return (
     <div className="home-container">
       <ToastContainer />
-      <div className="return-button-container">
-        <button
-          className="return-button"
-          onClick={() => { navigate("/return") }}
-        >
-          Return Bike
-        </button>
-      </div>
+      {type !== "admin" ? (
+        <div className="return-button-container">
+          <button
+            className="return-button"
+            onClick={() => {
+              navigate("/return");
+            }}
+          >
+            Return Bike
+          </button>
+        </div>
+      ) : (
+        ""
+      )}
       <div className="header">
         <h1>Explore all the different types of bikes</h1>
       </div>
@@ -62,7 +68,9 @@ const HomePage = () => {
         <>
           {allBikes.length > 0 ? (
             <div className="bike-cards">
-              {allBikes.map((data) => <BikeComponent data={data} />)}
+              {allBikes.map((data) => (
+                <BikeComponent data={data} type={type} />
+              ))}
             </div>
           ) : (
             <p className="no-data">No Data Found</p>

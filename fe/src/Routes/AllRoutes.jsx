@@ -12,6 +12,12 @@ import ProfilePage from "../Pages/ProfilePage";
 import DashboardPage from "../Pages/Dashboard";
 import EditBike from "../Pages/EditBike";
 import AddBikePage from "../Pages/AddBikePage";
+import AdminPanelPage from "../Pages/AdminPanelPage";
+import CustomersPage from "../Pages/CustomersPage";
+import SellerPage from "../Pages/SellerPage";
+import AllBikesPage from "../Pages/AllBikesPage";
+import CustomerRevenuePage from "../Pages/CustomerRevenuePage";
+import SellerRevenuePage from "../Pages/SellerRevenuePage";
 const AllRoutes = () => {
   return (
     <Routes>
@@ -33,6 +39,54 @@ const AllRoutes = () => {
             <DashboardPage />
           </PrivateRoute>
         }
+      />
+      <Route
+        path="/admin-panel"
+        element={
+          <PrivateRoute>
+            <AdminPanelPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/all-customer"
+        element={
+          <PrivateRoute>
+            <CustomersPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+      path="/customer-revenue"
+      element={
+        <PrivateRoute>
+          <CustomerRevenuePage/>
+        </PrivateRoute>
+      }
+      />
+      <Route
+      path="/seller-revenue"
+      element={
+        <PrivateRoute>
+          <SellerRevenuePage/>
+        </PrivateRoute>
+      }
+      />
+      <Route
+        path="/all-seller"
+        element={
+          <PrivateRoute>
+            <SellerPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+      path="/all-bikes"
+      element={
+        <PrivateRoute>
+          <AllBikesPage/>
+        </PrivateRoute>
+      }
       />
       <Route
         path="/bike/:id"

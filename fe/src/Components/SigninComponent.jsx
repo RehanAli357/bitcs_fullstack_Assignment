@@ -60,6 +60,7 @@ const SignIn = () => {
         response = await commonAxios("seller/add-seller", "POST", formData);
       }
       if (response.status !== 201) {
+        toast.error(response.response.data.message);
       } else {
         navigate("/login");
       }

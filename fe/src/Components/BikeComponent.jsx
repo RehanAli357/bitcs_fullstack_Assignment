@@ -6,7 +6,7 @@ import { useCookies } from "react-cookie";
 import commonAxios from "../Global/CommonAxios/commonAxios";
 import { toast } from "react-toastify";
 
-const BikeComponent = ({ data ,getItem}) => {
+const BikeComponent = ({ data, getItem, type }) => {
   const [cookies] = useCookies(["accessToken", "roleId"]);
   const user = useContext(UserContext);
   const Bike = useContext(BikeContext);
@@ -37,10 +37,10 @@ const BikeComponent = ({ data ,getItem}) => {
       );
       if (res.status === 200) {
         toast.success(res.data.message);
-        getItem()
+        getItem();
       }
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       toast.error(res.response.data.message);
     }
   };
@@ -76,13 +76,15 @@ const BikeComponent = ({ data ,getItem}) => {
             >
               Edit Bike Details
             </button>
-          ) : (
+          ) : cookies.roleId === "cus001" ? (
             <button
               className="primary-btn"
               onClick={() => handleRent(data.bId)}
             >
               Rent a Bike
             </button>
+          ) : (
+            ""
           )
         ) : (
           <p className="unavailable">Bike Is Unavailable</p>
@@ -94,8 +96,10 @@ const BikeComponent = ({ data ,getItem}) => {
         >
           Bike Details
         </button>
-        {cookies.roleId !== "cus001" && data.available === true &&
-        (data?.cId?.length <= 0 || data.cId === null)? (
+        {cookies.roleId !== "cus001" &&
+        cookies.roleId !== "admin1" &&
+        data.available === true &&
+        (data?.cId?.length <= 0 || data.cId === null) ? (
           <button
             onClick={() => {
               deleteBike(data.bId);

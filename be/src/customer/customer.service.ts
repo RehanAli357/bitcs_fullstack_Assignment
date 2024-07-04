@@ -23,8 +23,8 @@ import { CustomerPaymentService } from './customerPayment.service';
 
 export enum ERole {
   customer = 'cus001',
-  admin = 'adm001',
-  seller='sel001'
+  admin = 'admin1',
+  seller = 'sel001',
 }
 
 @Injectable()
@@ -34,15 +34,25 @@ export class CustomerService {
     private customerRepository: Repository<Customer>,
 
     private globalService: GloablService,
-    private customerPaymentService : CustomerPaymentService,
+    private customerPaymentService: CustomerPaymentService,
     @Inject(forwardRef(() => BikeService))
     private BikeService: BikeService,
   ) {}
 
   async addCustomer(addCustomerDto: addUserDto): Promise<Object> {
     try {
+      const existingCustomer = await this.customerRepository.find({
+        where: { cEmail: addCustomerDto.email },
+      });
+      
+      if (existingCustomer.length > 0) {
+        throw new BadRequestException({
+          message: 'This account is already taken',
+          status: false,
+        });
+      }
       const customer = await this.globalService.addUser(
-        addCustomerDto,
+      addCustomerDto,
         'customer',
       );
       await this.customerRepository.save(customer);
@@ -51,9 +61,11 @@ export class CustomerService {
         status: true,
       };
     } catch (error) {
-      console.log(`Failed to add customer: ${error.message}`);
+      console.error(`Failed to add customer: ${error.message}`);
       throw new BadRequestException({
-        message: 'Failed to add customer',
+        message: error.response
+          ? error.response.message
+          : 'Failed to add customer',
         status: false,
       });
     }
@@ -128,7 +140,9 @@ export class CustomerService {
     } catch (error) {
       console.log('Unable to fetch user:', error.message);
       throw new BadRequestException({
-        message: 'Error in fetching user details',
+        message: error.response
+          ? error.response.message
+          : 'Error in fetching user details',
         status: false,
       });
     }
@@ -220,6 +234,17 @@ export class CustomerService {
     }
   }
 
+  async fetchCustomerCount(){
+    try {
+      return await this.customerRepository.count()
+    } catch (error) {
+      console.log('Error in Fetching user count:', error.message);
+      throw new BadRequestException({
+        message: 'Error in Fetching user count',
+        status: false,
+      });
+    }
+  }
   async getAllBike() {
     try {
       return await this.BikeService.getAllBike();
@@ -232,9 +257,9 @@ export class CustomerService {
     }
   }
 
-  async getBike(id:deleteBikeDto){
+  async getBike(id: deleteBikeDto) {
     try {
-      return await this.BikeService.getBikeData(id)
+      return await this.BikeService.getBikeData(id);
     } catch (error) {
       console.log('Error in Fetching bike details:', error.message);
       throw new BadRequestException({
@@ -270,26 +295,49 @@ export class CustomerService {
     }
   }
 
-  async getBookedBike(cId:string){
+  async getBookedBike(cId: string) {
     try {
-      const data = await this.BikeService.getBookedBike(cId)
-      return data
+      const data = await this.BikeService.getBookedBike(cId);
+      return data;
     } catch (error) {
       throw new BadRequestException({
         message: 'Unable to return a bike at this moment',
         status: false,
       });
-      
     }
   }
 
-  async fetchPayment(cId:string){
+  async fetchPayment(cId: string) {
     try {
-      const data = await this.customerPaymentService.fetchPayment(cId)
+      const data = await this.customerPaymentService.fetchPayment(cId);
+      return data;
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Unable to fetch the payment history',
+        status: false,
+      });
+    }
+  }
+
+  async fetchAllCustomerRevenue(){
+    try {
+      const data = await this.customerPaymentService.fetchAllCustomerRevenue();
       return data
     } catch (error) {
       throw new BadRequestException({
-        message: 'Unable to return a bike at this moment',
+        message: 'Unable to fetch the total revenue of the customer',
+        status: false,
+      });
+    }
+  }
+
+  async FetchCustomerDetailsRevenue(){
+    try {
+      const data = await this.customerPaymentService.FetchCustomerDetailsRevenue();
+      return data
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Unable to fetch the All revenue  details of the customer',
         status: false,
       });
     }

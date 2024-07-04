@@ -65,8 +65,8 @@ export class BikeService {
   async addBikeTaken(bId: string, sId: string, createdTime: Date) {
     try {
       let bikeTakenData = {};
-      const btId=uuidv4()
-      console.log(btId)
+      const btId = uuidv4();
+      console.log(btId);
       bikeTakenData = {
         bId: bId,
         btId: btId,
@@ -75,8 +75,8 @@ export class BikeService {
         bTime: 0,
         createdTime: createdTime,
       };
-      const data=await this.bikeTakenRepository.save(bikeTakenData);
-      console.log(data,"\n",bikeTakenData)
+      const data = await this.bikeTakenRepository.save(bikeTakenData);
+      console.log(data, '\n', bikeTakenData);
       return true;
     } catch (error) {
       console.log('Unable to get Bike:', error.message);
@@ -173,6 +173,15 @@ export class BikeService {
     }
   }
 
+  async fetchBikeCount() {
+    try {
+      return await this.bikeRepository.count();
+    } catch (error) {
+      console.log('Unable to get all Bikes data:', error.message);
+      return false;
+    }
+  }
+
   async getBikeData(bikeIdDto: deleteBikeDto) {
     try {
       const bike = await this.bikeRepository.findOne({
@@ -235,6 +244,29 @@ export class BikeService {
       return data;
     } catch (error) {
       console.log('Unable to get all bike data of seller:', error.message);
+      return false;
+    }
+  }
+
+  async fetchAllSellerRevenue() {
+    try {
+      const data = await this.bikeTakenRepository
+        .createQueryBuilder('bIncome')
+        .select('SUM(bIncome)', 'sum')
+        .getRawOne();
+      return data.sum;
+    } catch (error) {
+      console.log('Unable to get seller revenue:', error.message);
+      return false;
+    }
+  }
+
+  async FetchSellerDetailsRevenue(){
+    try {
+      const data = await this.bikeTakenRepository.find()
+      return data;
+    } catch (error) {
+      console.log('Unable to get seller revenue details:', error.message);
       return false;
     }
   }

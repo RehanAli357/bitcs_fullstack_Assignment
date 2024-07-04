@@ -29,15 +29,35 @@ export class CustomerPaymentService {
     }
   }
 
-  async fetchPayment(cId:string){
+  async fetchPayment(cId: string) {
     try {
-      return await this.CustomerPaymentRepository.find({where:{cId:cId}})
+      return await this.CustomerPaymentRepository.find({ where: { cId: cId } });
     } catch (error) {
       console.log('Unable to add paymentCustomer data:', error.message);
       return false;
     }
   }
-  async fetchAllPayment(){
-    this.CustomerPaymentRepository.find()
+  async fetchAllCustomerRevenue() {
+    try {
+      const totalRevenue =
+        await this.CustomerPaymentRepository.createQueryBuilder('payment')
+          .select('SUM(payment)', 'sum')
+          .getRawOne();
+
+      return totalRevenue.sum;
+    } catch (error) {
+      console.log('Unable to fetch Customers total revenue:', error.message);
+      return false;
+    }
+  }
+
+  async FetchCustomerDetailsRevenue() {
+    try {
+      const data = await this.CustomerPaymentRepository.find();
+      return data;
+    } catch (error) {
+      console.log('Unable to fetch Customers total revenue:', error.message);
+      return false;
+    }
   }
 }

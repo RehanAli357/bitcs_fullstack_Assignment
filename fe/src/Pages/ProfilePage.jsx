@@ -13,6 +13,11 @@ const ProfilePage = () => {
     oldPassword: "",
     newPassword: "",
   });
+  const [deleteAccountDetails, setDeleteAccountDetails] = useState({
+    email: "",
+    password: "",
+  });
+  const [isDeleted, setIsDeleted] = useState(false);
   const [cookies, , removeCookies] = useCookies(["accessToken", "roleId"]);
 
   const navigate = useNavigate();
@@ -55,6 +60,8 @@ const ProfilePage = () => {
       res = await commonAxios("customer/", "GET", {}, cookies.accessToken);
     } else if (cookies.roleId === "sel001") {
       res = await commonAxios("seller/", "GET", {}, cookies.accessToken);
+    } else {
+      res = await commonAxios("admin/", "GET", {}, cookies.accessToken);
     }
     if (res.status === 200) {
       setUser(res?.data);
@@ -76,53 +83,158 @@ const ProfilePage = () => {
       [name]: value,
     }));
   };
-  const handleSubmit = (e) => {
-    e.preventDeault();
-    if(cookies.roleId==="cus001"){
 
-    }else{
-     console.log(changePassword) 
+  const handleDeleteChange = (e) => {
+    const { name, value } = e.target;
+    setDeleteAccountDetails((pdata) => ({
+      ...pdata,
+      [name]: value,
+    }));
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    let response;
+    if (cookies.roleId === "cus001") {
+      response = await commonAxios(
+        "customer",
+        "PUT",
+        changePassword,
+        cookies.accessToken
+      );
+    } else if (cookies.roleId === "admin1") {
+      response = await commonAxios(
+        "admin",
+        "PUT",
+        changePassword,
+        cookies.accessToken
+      );
+    } else {
+      response = await commonAxios(
+        "seller",
+        "PUT",
+        changePassword,
+        cookies.accessToken
+      );
     }
+    if (response.status === 200) {
+      navigate("/login");
+      logoutUser();
+    } else {
+      toast.error(response?.response?.data?.message);
+    }
+    setChangePassword({
+      oldPassword: "",
+      newPassword: "",
+    });
+  };
+  const handleDeleteSubmit = async (e) => {
+    e.preventDefault();
+    let response;
+    if (cookies.roleId === "cus001") {
+      response = await commonAxios(
+        "customer",
+        "DELETE",
+        deleteAccountDetails,
+        cookies.accessToken
+      );
+    } else if (cookies.roleId === "admin1") {
+      response = await commonAxios(
+        "admin",
+        "DELETE",
+        deleteAccountDetails,
+        cookies.accessToken
+      );
+    } else {
+      response = await commonAxios(
+        "seller",
+        "DELETE",
+        deleteAccountDetails,
+        cookies.accessToken
+      );
+    }
+    if (response.status === 200) {
+      navigate("/signin");
+      logoutUser();
+    } else {
+      toast.error(response?.response?.data?.message);
+    }
+    setDeleteAccountDetails({
+      email: "",
+      password: "",
+    });
   };
 
-  const deleteAccount = ()=>{
-    console.log("first")
-  }
+  const deleteAccount = () => {
+    setIsDeleted(!isDeleted);
+  };
   const renderUser = () => {
     return (
       <div className="profile-container">
         <img src={Profile} alt="user-profile" className="profile-image" />
-        <p className="profile-name">{cookies.roleId==="cus001" ? user.cName:user.sName}</p>
-        <p className="profile-email">{cookies.roleId==="cus001" ? user.cEmail:user.sEmail}</p>
-        <div className="update-password">
-          <p>Update Password</p>
-          <form onSubmit={handleSubmit}>
-            <input
-              value={changePassword.oldPassword}
-              name="oldPassword"
-              onChange={handleChange}
-              type="password"
-              placeholder="Old Password"
-              required
-            />
-            <input
-              value={changePassword.newPassword}
-              name="newPassword"
-              type="password"
-              onChange={handleChange}
-              placeholder="New Password"
-              required
-            />
-            <button type="submit" className="primary-btn">
-              Submit
-            </button>
-          </form>
-        </div>
+        <p className="profile-name">
+          {cookies.roleId === "cus001" ? user.cName : cookies.roleId==="admin1" ? user.aName : user.sName}
+        </p>
+        <p className="profile-email">
+          {cookies.roleId === "cus001" ? user.cEmail : cookies.roleId==="admin1" ? user.aEmail : user.sEmail}
+        </p>
+        {!isDeleted ? (
+          <div className="update-password">
+            <p>Update Password</p>
+            <form onSubmit={handleSubmit}>
+              <input
+                value={changePassword.oldPassword}
+                name="oldPassword"
+                onChange={handleChange}
+                type="password"
+                placeholder="Old Password"
+                required
+              />
+              <input
+                value={changePassword.newPassword}
+                name="newPassword"
+                type="password"
+                onChange={handleChange}
+                placeholder="New Password"
+                required
+              />
+              <button type="submit" className="primary-btn">
+                Submit
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="update-password">
+            <p>Delete Account</p>
+            <form onSubmit={handleDeleteSubmit}>
+              <input
+                value={deleteAccountDetails.email}
+                name="email"
+                onChange={handleDeleteChange}
+                type="email"
+                placeholder="Email Id"
+                required
+              />
+              <input
+                value={deleteAccountDetails.password}
+                name="password"
+                type="password"
+                onChange={handleDeleteChange}
+                placeholder="Password"
+                required
+              />
+              <button type="submit" className="primary-btn">
+                Submit
+              </button>
+            </form>
+          </div>
+        )}
         <div className="profile-actions">
           <button onClick={logoutUser} className="secondary-btn">
             Logout
           </button>
-          <button onClick={deleteAccount}className="danger-btn">Delete Account</button>
+          <button onClick={deleteAccount} className="danger-btn">
+            {!isDeleted ? "Delete Account" : "Update Password"}
+          </button>
         </div>
       </div>
     );
@@ -158,8 +270,10 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (cookies.accessToken) {
-      getPaymentHistory();
       getUSer();
+      if (cookies.roleId !== "admin1") {
+        getPaymentHistory();
+      }
     }
   }, [cookies.accessToken]);
 
@@ -167,26 +281,30 @@ const ProfilePage = () => {
     <div className="profile-page">
       <ToastContainer />
       {user ? renderUser() : "No Details Found"}
-      {loading ? (
-        <p className="loading">Loading...</p>
-      ) : (
-        <div className="payment-history">
-          <h2>Payment History</h2>
-          <div className="payment-table">
-            <div className="payment-row header">
-              <div className="payment-cell">SNo.</div>
-              <div className="payment-cell">PaymentId</div>
-              <div className="payment-cell">Total Hours</div>
-              <div className="payment-cell">Total Payment</div>
-              <div className="payment-cell">Payment Time</div>
+      {cookies.roleId !== "admin1" ? (
+        loading ? (
+          <p className="loading">Loading...</p>
+        ) : (
+          <div className="payment-history">
+            <h2>Payment History</h2>
+            <div className="payment-table">
+              <div className="payment-row header">
+                <div className="payment-cell">SNo.</div>
+                <div className="payment-cell">PaymentId</div>
+                <div className="payment-cell">Total Hours</div>
+                <div className="payment-cell">Total Payment</div>
+                <div className="payment-cell">Payment Time</div>
+              </div>
+              {payments.length > 0 ? (
+                payments.map((data, index) => renderPaymentsData(data, index))
+              ) : (
+                <div className="payment-row">No Data Found</div>
+              )}
             </div>
-            {payments.length > 0 ? (
-              payments.map((data, index) => renderPaymentsData(data, index))
-            ) : (
-              <div className="payment-row no-data">No Data Found</div>
-            )}
           </div>
-        </div>
+        )
+      ) : (
+        ""
       )}
     </div>
   );

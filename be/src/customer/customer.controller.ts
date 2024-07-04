@@ -131,7 +131,7 @@ export class CustomerController {
 
   @Get('/get-bike/:id')
   @UseGuards(AuthGuard)
-  @roleGaurd(ERole.customer,ERole.seller)
+  @roleGaurd(ERole.customer,ERole.seller,ERole.admin)
   async getBike(@Param('id') id: string) {
     try {
       const bikeIdDto = new deleteBikeDto();

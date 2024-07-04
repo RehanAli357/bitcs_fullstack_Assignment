@@ -35,6 +35,16 @@ export class SellerService {
 
   async addSeller(addSellerDto: addUserDto): Promise<object> {
     try {
+      const existingCustomer = await this.sellerRepository.find({
+        where: { sEmail: addSellerDto.email },
+      });
+
+      if (existingCustomer.length > 0) {
+        throw new BadRequestException({
+          message: 'This account is already taken',
+          status: false,
+        });
+      }
       const seller = await this.globalService.addUser(addSellerDto, 'seller');
       await this.sellerRepository.save(seller);
       return {
@@ -208,6 +218,18 @@ export class SellerService {
     }
   }
 
+  async fetchSellerCount(){
+    try {
+      return await this.sellerRepository.count();
+    } catch (error) {
+      console.log('Error in Fetching seller count:', error.message);
+      throw new BadRequestException({
+        message: 'Error in Fetching seller count',
+        status: false,
+      });
+    }
+  }
+
   async addBike(user: authSellerInterface, addBikeDto: addBikeDto) {
     try {
       let data = {};
@@ -278,5 +300,17 @@ export class SellerService {
         status: false,
       });
     }
+  }
+
+  async FetchSellerDetailsRevenue(){
+      try {
+       return  await this.bikeService.FetchSellerDetailsRevenue()
+      } catch (error) {
+        console.log('Unable to get seller Bike Data', error.message);
+      throw new BadRequestException({
+        message: 'Unable to get seller revenue details',
+        status: false,
+      });
+      }
   }
 }
